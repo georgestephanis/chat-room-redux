@@ -1,6 +1,6 @@
 /* global chat_room_l10n */
 
-(function( $, ajax_url ){
+(function( $, misc ){
 
 	$('form.chat-room-input textarea').autosize({append: "\n"});
 
@@ -15,4 +15,4 @@
 		$textarea.val('').focus();
 	});
 
-}( jQuery, chat_room_l10n.ajax_url ));
+}( jQuery, chat_room_l10n ));
