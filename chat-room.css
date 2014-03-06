@@ -1,0 +1,43 @@
+
+.chat-room-wrapper {
+	border: 3px solid #88f;
+	border-radius: 8px;
+}
+
+.chat-room-wrapper * {
+	box-sizing: border-box;
+}
+
+.chat-room-wrapper .chat-room-scrollback {
+	background: #f00;
+}
+
+.chat-room-wrapper .chat-room-input {
+	border-top: 3px solid #88f;
+	background: #0f0;
+	overflow: hidden;
+}
+
+.chat-room-wrapper .chat-room-input textarea {
+	display: block;
+	width: 100%;
+	border: 0;
+	outline: none;
+	background: #eee;
+	font-size: 1em;
+	padding: 0.5em;
+	resize: none;
+	-webkit-transition: all 0.25s ease;
+	-moz-transition: all 0.25s ease;
+	-ms-transition: all 0.25s ease;
+	-o-transition: all 0.25s ease;
+	transition: all 0.25s ease;
+}
+
+.chat-room-wrapper .chat-room-input textarea:focus {
+	background: #fff;
+}
+
+.chat-room-wrapper .chat-room-input button {
+	float: right;
+}
