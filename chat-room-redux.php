@@ -98,21 +98,21 @@ class Chat_Room_Redux {
 	 * remarking that there were none found.
 	 */
 	public static function display_messages( $messages ) {
-		if ( $messages && is_array( $messages ) ) :
-			?>
-			<dl class="messages">
+		?>
+
+		<dl class="messages">
+		<?php if ( $messages && is_array( $messages ) ) : ?>
 			<?php foreach ( $messages as $msg ) : ?>
 				<dt><?php echo esc_html( get_userdata( $msg->user )->display_name ); ?>
 					( <?php echo date( get_option( 'time_format' ), $msg->when ); ?> )</dt>
 				<dd><?php echo esc_html( $msg->text ); ?></dd>
 			<?php endforeach; ?>
-			</dl>
-			<?php
-		else :
-			?>
-			<p class="messages no-messages-found"><?php esc_html_e( 'No messages … yet!' ); ?></p>
-			<?php
-		endif;
+		<?php else : ?>
+			<dt></dt><dd class="no-messages-found"><?php esc_html_e( 'No messages … yet!' ); ?></dd>
+		<?php endif; ?>
+		</dl>
+
+		<?php
 	}
 
 	/**
