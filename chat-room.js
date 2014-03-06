@@ -81,6 +81,7 @@
 		} );
 	}
 
+	setInterval( getNewMessages, misc.chk_interval * 1000 );
 	$(window).on('get-new-messages', getNewMessages);
 	$messages.parent().scrollTo( 'max' );
 

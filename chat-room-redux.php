@@ -172,6 +172,7 @@ class Chat_Room_Redux {
 			'nonce'        => wp_create_nonce( 'chat-room-' . $atts['chat_id'] ),
 			'display_name' => wp_get_current_user()->display_name,
 			'time_format'  => get_option( 'time_format' ),
+			'chk_interval' => 5,
 			'show_times'   => self::SHOW_TIMES,
 		) );
 		wp_enqueue_script( 'chat-room' );
