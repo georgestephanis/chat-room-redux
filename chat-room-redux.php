@@ -81,7 +81,7 @@ class Chat_Room_Redux {
 		$data = array(
 			'user' => get_current_user_id(),
 			'when' => time(),
-			'text' => wp_kses( $message, wp_kses_allowed_html( 'data' ) ),
+			'text' => $message,
 		);
 		return add_post_meta( $chat_id, self::MSG_META_KEY, (object) $data );
 	}
