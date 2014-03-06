@@ -108,7 +108,8 @@ class Chat_Room_Redux {
 				<dd><?php echo esc_html( $msg->text ); ?></dd>
 			<?php endforeach; ?>
 		<?php else : ?>
-			<dt></dt><dd class="no-messages-found"><?php esc_html_e( 'No messages … yet!' ); ?></dd>
+			<dt class="no-messages-found"></dt>
+			<dd class="no-messages-found"><?php esc_html_e( 'No messages … yet!' ); ?></dd>
 		<?php endif; ?>
 		</dl>
 
