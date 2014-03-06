@@ -253,16 +253,3 @@ class Chat_Room_Redux {
 	}
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
