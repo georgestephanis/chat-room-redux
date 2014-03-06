@@ -27,6 +27,7 @@
 		} );
 
 		event.preventDefault();
+		$messages.parent().scrollTo( 'max' );
 		$textarea.val('').focus();
 	});
 
@@ -52,10 +53,14 @@
 					new_html += '<dt>' + msg.user + ' ( ' + msg.when + ' )</dt><dd>' + msg.text + '</dd>';
 				});
 				$messages.html( new_html );
+
+				$messages.parent().scrollTo( 'max' );
 			} else {
 				console.log( 'No New Messages' );
 			}
 		} );
 	}
+
+	$messages.parent().scrollTo( 'max' );
 
 }( jQuery, chat_room_l10n ));

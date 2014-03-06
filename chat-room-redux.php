@@ -54,7 +54,8 @@ class Chat_Room_Redux {
 	 */
 	public static function register_scripts_styles() {
 		wp_register_script( 'autosize', plugins_url( 'jquery.autosize.min.js', __FILE__ ), array( 'jquery' ), '1.18.4' );
-		wp_register_script( 'chat-room', plugins_url( 'chat-room.js', __FILE__ ), array( 'jquery', 'autosize' ), false, true );
+		wp_register_script( 'scrollto', plugins_url( 'jquery.scrollto.min.js', __FILE__ ), array( 'jquery' ), '1.4.11' );
+		wp_register_script( 'chat-room', plugins_url( 'chat-room.js', __FILE__ ), array( 'jquery', 'scrollto', 'autosize' ), false, true );
 
 		wp_register_style( 'chat-room', plugins_url( 'chat-room.css', __FILE__ ) );
 	}
