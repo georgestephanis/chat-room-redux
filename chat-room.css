@@ -1,6 +1,6 @@
 
 .chat-room-wrapper {
-	border: 3px solid #88f;
+	border: 3px solid #444;
 	border-radius: 8px;
 }
 
@@ -11,7 +11,6 @@
 .chat-room-wrapper .chat-room-scrollback {
 	height: 300px;
 	overflow: auto;
-	background: #f00;
 }
 
 .chat-room-wrapper .chat-room-scrollback .messages {
@@ -36,8 +35,8 @@
 }
 
 .chat-room-wrapper .chat-room-input {
-	border-top: 3px solid #88f;
-	background: #0f0;
+	border-top: 3px solid #444;
+	background: #444;
 	overflow: hidden;
 }
 
