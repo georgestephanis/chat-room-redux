@@ -1,6 +1,7 @@
 /* global chat_room_l10n */
 
 (function( $, misc ){
+	var $messages = $('.chat-room-scrollback .messages');
 
 	$('form.chat-room-input textarea').autosize({append: "\n"});
 
@@ -20,7 +21,9 @@
 				}
 				return;
 			}
-			console.log( data );
+
+			$messages.find('.no-messages-found').remove();
+			$messages.append( '<dt>' + data.data.user + ' ( ' + data.data.when + ' )</dt><dd>' + data.data.text + '</dd>' );
 		} );
 
 		event.preventDefault();
