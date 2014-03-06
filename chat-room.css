@@ -75,4 +75,18 @@
 	float: right;
 	border: 0 solid #444;
 	border-radius: 0 0 6px 0;
+	background: #24890d;
+	color: #fff;
+	outline: 0;
+	font-size: 1em;
+	font-weight: 700;
+	padding: 10px 30px 11px;
+	margin: 0;
+	text-transform: uppercase;
+	vertical-align: bottom;
+}
+
+.chat-room-wrapper .chat-room-input button:hover {
+	background-color: #41a62a;
+	color: #fff;
 }
