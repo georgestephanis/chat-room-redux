@@ -53,9 +53,6 @@ class Chat_Room_Redux {
 	public static function register_scripts_styles() {
 		wp_register_script( 'autosize', plugins_url( 'jquery.autosize.min.js', __FILE__ ), array( 'jquery' ), '1.18.4' );
 		wp_register_script( 'chat-room', plugins_url( 'chat-room.js', __FILE__ ), array( 'jquery', 'autosize' ), false, true );
-		wp_localize_script( 'chat-room', 'chat_room_l10n', array(
-			'ajax_url' => admin_url( 'admin-ajax.php' ),
-		) );
 
 		wp_register_style( 'chat-room', plugins_url( 'chat-room.css', __FILE__ ) );
 	}
@@ -150,6 +147,13 @@ class Chat_Room_Redux {
 			return ob_get_clean();
 		}
 
+		wp_localize_script( 'chat-room', 'chat_room_l10n', array(
+			'chat_id'      => $atts['chat_id'],
+			'ajax_url'     => admin_url( 'admin-ajax.php' ),
+			'nonce'        => wp_create_nonce( 'chat-room-' . $atts['chat_id'] ),
+			'display_name' => wp_get_current_user()->display_name,
+			'time_format'  => get_option( 'time_format' ),
+		) );
 		wp_enqueue_script( 'chat-room' );
 		wp_enqueue_style( 'chat-room' );
 		ob_start();
