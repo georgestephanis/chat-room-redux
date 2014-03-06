@@ -19,17 +19,26 @@
 		$submit_btn.prop( 'disabled', true );
 
 		$.getJSON( misc.ajax_url, submit_data, function( data ) {
+			var new_html = '',
+				msg      = data.data;
+
 			if ( ! data.success ) {
 				if ( console ) {
-					console.log( data.data );
+					console.log( msg );
 					$textarea.prop( 'readonly', false ).focus();
 					$submit_btn.prop( 'disabled', false );
 				}
 				return;
 			}
 
+			new_html += '<dt>' + msg.user;
+			if ( misc.show_times ) {
+				new_html += ' ( ' + msg.when + ' )';
+			}
+			new_html += '</dt><dd>' + msg.text + '</dd>';
+
 			$messages.find('.no-messages-found').remove();
-			$messages.append( '<dt>' + data.data.user + ' ( ' + data.data.when + ' )</dt><dd>' + data.data.text + '</dd>' );
+			$messages.append( new_html );
 			$messages.parent().scrollTo( 'max' );
 			$textarea.prop( 'readonly', false ).val('').focus();
 			$submit_btn.prop( 'disabled', false );
@@ -57,7 +66,11 @@
 
 			if ( data.data ) {
 				$.each( data.data, function( index, msg ) {
-					new_html += '<dt>' + msg.user + ' ( ' + msg.when + ' )</dt><dd>' + msg.text + '</dd>';
+					new_html += '<dt>' + msg.user;
+					if ( misc.show_times ) {
+						new_html += ' ( ' + msg.when + ' )';
+					}
+					new_html += '</dt><dd>' + msg.text + '</dd>';
 				});
 				$messages.html( new_html );
 

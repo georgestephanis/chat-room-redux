@@ -16,6 +16,7 @@ class Chat_Room_Redux {
 	const POST_TYPE    = 'chat-room';
 	const MSG_META_KEY = 'chat-room-message';
 	const SHORTCODE    = 'chat-room';
+	const SHOW_TIMES   = false;
 
 	/**
 	 * Kicks everything off.
@@ -106,7 +107,10 @@ class Chat_Room_Redux {
 		<?php if ( $messages && is_array( $messages ) ) : ?>
 			<?php foreach ( $messages as $msg ) : ?>
 				<dt><?php echo esc_html( $msg->user ); ?>
-					( <?php echo esc_html( $msg->when ); ?> )</dt>
+					<?php if ( self::SHOW_TIMES ) : ?>
+						( <?php echo esc_html( $msg->when ); ?> )
+					<?php endif; ?>
+				</dt>
 				<dd><?php echo esc_html( $msg->text ); ?></dd>
 			<?php endforeach; ?>
 		<?php else : ?>
@@ -168,6 +172,7 @@ class Chat_Room_Redux {
 			'nonce'        => wp_create_nonce( 'chat-room-' . $atts['chat_id'] ),
 			'display_name' => wp_get_current_user()->display_name,
 			'time_format'  => get_option( 'time_format' ),
+			'show_times'   => self::SHOW_TIMES,
 		) );
 		wp_enqueue_script( 'chat-room' );
 		wp_enqueue_style( 'chat-room' );
