@@ -155,6 +155,10 @@ class Chat_Room_Redux {
 
 		$atts = shortcode_atts( $pairs, $atts, self::SHORTCODE );
 
+		if ( ! is_user_logged_in() ) {
+			return '<p>' . sprintf( _x( 'You must be <a href="%s">logged in</a> to view or participate in this chat.', 'Link goes to login page.' ), wp_login_url( get_permalink() ) ) . '</p>';
+		}
+
 		$messages = self::get_messages( intval( $atts['chat_id'] ) );
 		$messages = array_map( array( __CLASS__, 'prettify_message' ), $messages );
 
