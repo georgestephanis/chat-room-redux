@@ -24,8 +24,8 @@ class Chat_Room_Redux {
 		self::register_post_type();
 		self::register_scripts_styles();
 
-		add_action( 'wp_ajax_chat_room_add_message', array( __CLASS__, 'wp_ajax_chat_room_add_message' ) );
 		add_filter( 'the_content', array( __CLASS__, 'add_chat_room' ), 0 );
+		add_action( 'wp_ajax_chat_room_add_message', array( __CLASS__, 'wp_ajax_chat_room_add_message' ) );
 		add_action( 'wp_ajax_chat_room_get_new_messages', array( __CLASS__, 'wp_ajax_chat_room_get_new_messages' ) );
 
 		add_shortcode( self::SHORTCODE, array( __CLASS__, 'chat_room' ) );
