@@ -9,12 +9,29 @@
 }
 
 .chat-room-wrapper .chat-room-scrollback {
+	height: 300px;
+	overflow: auto;
 	background: #f00;
 }
 
 .chat-room-wrapper .chat-room-scrollback .messages {
+	overflow: hidden;
 	margin: 0;
 	padding: 0.5em;
+}
+
+.chat-room-wrapper .chat-room-scrollback .messages dt,
+.chat-room-wrapper .chat-room-scrollback .messages dd {
+	display: block;
+}
+
+.chat-room-wrapper .chat-room-scrollback .messages dt {
+	font-weight: 700;
+}
+
+.chat-room-wrapper .chat-room-scrollback .messages dd {
+	padding-left: 1em;
+	margin: 0;
 }
 
 .chat-room-wrapper .chat-room-input {
