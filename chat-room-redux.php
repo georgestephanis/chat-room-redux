@@ -24,6 +24,7 @@ class Chat_Room_Redux {
 		self::register_post_type();
 		self::register_scripts_styles();
 
+		add_action( 'wp_ajax_chat_room_add_message', array( __CLASS__, 'wp_ajax_chat_room_add_message' ) );
 		add_filter( 'the_content', array( __CLASS__, 'add_chat_room' ), 0 );
 
 		add_shortcode( self::SHORTCODE, array( __CLASS__, 'chat_room' ) );
@@ -169,6 +170,39 @@ class Chat_Room_Redux {
 		</div>
 		<?php
 		return ob_get_clean();
+	}
+
+	/**
+	 * The catcher for our add message ajax request.
+	 */
+	public static function wp_ajax_chat_room_add_message() {
+		if ( ! isset( $_REQUEST['message'], $_REQUEST['chat_id'], $_REQUEST['nonce'] ) ) {
+			wp_send_json_error( __( 'Error: Missing Arguments.' ) );
+		}
+
+		$message = trim( wp_kses( $_REQUEST['message'], wp_kses_allowed_html( 'data' ) ) );
+		$chat_id = (int) $_REQUEST['chat_id'];
+		$nonce   = $_REQUEST['nonce'];
+
+		if ( empty( $message ) ) {
+			wp_send_json_error( __( 'Error: Empty Message.' ) );
+		}
+
+		if ( empty( $chat_id ) ) {
+			wp_send_json_error( __( 'Error: Invalid Chat ID.' ) );
+		}
+
+		if ( ! wp_verify_nonce( $nonce, 'chat-room-' . $chat_id ) ) {
+			wp_send_json_error( __( 'Error: Invalid Nonce.' ) );
+		}
+
+		self::add_message( $message, $chat_id );
+
+		wp_send_json_success( array(
+			'user' => wp_get_current_user()->display_name,
+			'when' => date( get_option( 'time_format' ) ),
+			'text' => $message,
+		) );
 	}
 
 }
