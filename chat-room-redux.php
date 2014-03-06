@@ -26,6 +26,7 @@ class Chat_Room_Redux {
 
 		add_action( 'wp_ajax_chat_room_add_message', array( __CLASS__, 'wp_ajax_chat_room_add_message' ) );
 		add_filter( 'the_content', array( __CLASS__, 'add_chat_room' ), 0 );
+		add_action( 'wp_ajax_chat_room_get_new_messages', array( __CLASS__, 'wp_ajax_chat_room_get_new_messages' ) );
 
 		add_shortcode( self::SHORTCODE, array( __CLASS__, 'chat_room' ) );
 	}
@@ -204,6 +205,32 @@ class Chat_Room_Redux {
 			'when' => date( get_option( 'time_format' ) ),
 			'text' => $message,
 		) );
+	}
+
+	public static function wp_ajax_chat_room_get_new_messages() {
+		if ( ! isset( $_REQUEST['count'], $_REQUEST['chat_id'], $_REQUEST['nonce'] ) ) {
+			wp_send_json_error( __( 'Error: Missing Arguments.' ) );
+		}
+
+		$count   = (int) $_REQUEST['count'];
+		$chat_id = (int) $_REQUEST['chat_id'];
+		$nonce   = $_REQUEST['nonce'];
+
+		if ( empty( $chat_id ) ) {
+			wp_send_json_error( __( 'Error: Invalid Chat ID.' ) );
+		}
+		
+		if ( ! wp_verify_nonce( $nonce, 'chat-room-' . $chat_id ) ) {
+			wp_send_json_error( __( 'Error: Invalid Nonce.' ) );
+		}
+
+		$messages = self::get_messages( intval( $_REQUEST['chat_id'] ) );
+
+		if ( sizeof( $messages ) == $count ) {
+			wp_send_json_success( 0 );
+		}
+
+		wp_send_json_success( $messages );
 	}
 
 }

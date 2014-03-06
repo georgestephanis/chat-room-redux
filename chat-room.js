@@ -30,4 +30,32 @@
 		$textarea.val('').focus();
 	});
 
+	function getNewMessages() {
+		var new_html = '',
+			submit_data = {
+				action  : 'chat_room_get_new_messages',
+				count   : $messages.find('dt:not(.no-messages-found)').length,
+				chat_id : misc.chat_id,
+				nonce   : misc.nonce
+			};
+
+		$.getJSON( misc.ajax_url, submit_data, function( data ) {
+			if ( ! data.success ) {
+				if ( console ) {
+					console.log( data.data );
+				}
+				return;
+			}
+
+			if ( data.data ) {
+				$.each( data.data, function( index, msg ) {
+					new_html += '<dt>' + msg.user + ' ( ' + msg.when + ' )</dt><dd>' + msg.text + '</dd>';
+				});
+				$messages.html( new_html );
+			} else {
+				console.log( 'No New Messages' );
+			}
+		} );
+	}
+
 }( jQuery, chat_room_l10n ));
