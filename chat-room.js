@@ -61,6 +61,7 @@
 		} );
 	}
 
+	$(window).on('get-new-messages', getNewMessages);
 	$messages.parent().scrollTo( 'max' );
 
 }( jQuery, chat_room_l10n ));
