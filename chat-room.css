@@ -12,6 +12,11 @@
 	background: #f00;
 }
 
+.chat-room-wrapper .chat-room-scrollback .messages {
+	margin: 0;
+	padding: 0.5em;
+}
+
 .chat-room-wrapper .chat-room-input {
 	border-top: 3px solid #88f;
 	background: #0f0;
