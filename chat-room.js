@@ -73,7 +73,7 @@
 					if ( misc.show_times ) {
 						new_html += ' ( ' + msg.when + ' )';
 					}
-					new_html += '</dt><dd>' + msg.text + '</dd>';
+					new_html += ' </dt><dd>' + msg.text + '</dd>';
 				});
 				$messages.html( new_html );
 
