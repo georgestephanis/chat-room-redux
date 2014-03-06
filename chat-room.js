@@ -7,6 +7,7 @@
 
 	$('form.chat-room-input').submit(function(event){
 		var $textarea   = $(this).closest('form').find('textarea'),
+			$submit_btn = $(this).closest('form').find('button'),
 			submit_data = {
 				action  : 'chat_room_add_message',
 				message : $textarea.val(),
@@ -14,21 +15,27 @@
 				nonce   : misc.nonce
 			};
 
+		$textarea.prop( 'readonly', true );
+		$submit_btn.prop( 'disabled', true );
+
 		$.getJSON( misc.ajax_url, submit_data, function( data ) {
 			if ( ! data.success ) {
 				if ( console ) {
 					console.log( data.data );
+					$textarea.prop( 'readonly', false ).focus();
+					$submit_btn.prop( 'disabled', false );
 				}
 				return;
 			}
 
 			$messages.find('.no-messages-found').remove();
 			$messages.append( '<dt>' + data.data.user + ' ( ' + data.data.when + ' )</dt><dd>' + data.data.text + '</dd>' );
+			$messages.parent().scrollTo( 'max' );
+			$textarea.prop( 'readonly', false ).val('').focus();
+			$submit_btn.prop( 'disabled', false );
 		} );
 
 		event.preventDefault();
-		$messages.parent().scrollTo( 'max' );
-		$textarea.val('').focus();
 	});
 
 	function getNewMessages() {
