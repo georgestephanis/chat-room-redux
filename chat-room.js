@@ -40,7 +40,10 @@
 			$messages.find('.no-messages-found').remove();
 			$messages.append( new_html );
 			$messages.parent().scrollTo( 'max' );
-			$textarea.prop( 'readonly', false ).val('').focus();
+			$textarea.prop( 'readonly', false )
+						.val('')
+						.focus()
+						.trigger('autosize.resize');
 			$submit_btn.prop( 'disabled', false );
 		} );
 
