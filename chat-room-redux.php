@@ -105,8 +105,8 @@ class Chat_Room_Redux {
 		<dl class="messages">
 		<?php if ( $messages && is_array( $messages ) ) : ?>
 			<?php foreach ( $messages as $msg ) : ?>
-				<dt><?php echo esc_html( get_userdata( $msg->user )->display_name ); ?>
-					( <?php echo date( get_option( 'time_format' ), $msg->when ); ?> )</dt>
+				<dt><?php echo esc_html( $msg->user ); ?>
+					( <?php echo esc_html( $msg->when ); ?> )</dt>
 				<dd><?php echo esc_html( $msg->text ); ?></dd>
 			<?php endforeach; ?>
 		<?php else : ?>
@@ -129,6 +129,16 @@ class Chat_Room_Redux {
 	}
 
 	/**
+	 * Apply formatting to a raw message from the db.
+	 */
+	public static function prettify_message( $msg ) {
+		$msg->user = get_userdata( $msg->user )->display_name;
+		$msg->when = date( get_option( 'time_format' ), $msg->when );
+
+		return $msg;
+	}
+
+	/**
 	 * Displays the chat room. If the shortcode is used, will display that way.
 	 * Otherwise, will be appended to the end.
 	 *
@@ -142,6 +152,7 @@ class Chat_Room_Redux {
 		$atts = shortcode_atts( $pairs, $atts, self::SHORTCODE );
 
 		$messages = self::get_messages( intval( $atts['chat_id'] ) );
+		$messages = array_map( array( __CLASS__, 'prettify_message' ), $messages );
 
 		// If we're not on the single post page, we don't
 		// want to display it as a chat room.
@@ -226,6 +237,7 @@ class Chat_Room_Redux {
 		}
 
 		$messages = self::get_messages( intval( $_REQUEST['chat_id'] ) );
+		$messages = array_map( array( __CLASS__, 'prettify_message' ), $messages );
 
 		if ( sizeof( $messages ) == $count ) {
 			wp_send_json_success( 0 );
