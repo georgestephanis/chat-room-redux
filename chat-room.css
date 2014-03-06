@@ -38,6 +38,10 @@
 	content: ':';
 }
 
+.chat-room-wrapper .chat-room-scrollback .messages dt.no-messages-found:after {
+	content: '';
+}
+
 .chat-room-wrapper .chat-room-scrollback .messages dd {
 	padding-left: 0.35em;
 	margin: 0;
