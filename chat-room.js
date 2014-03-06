@@ -2,6 +2,8 @@
 
 (function( $, ajax_url ){
 
+	$('form.chat-room-input textarea').autosize({append: "\n"});
+
 	$('form.chat-room-input').submit(function(event){
 		var $textarea = $(this).closest('form').find('textarea'),
 			input     = $textarea.val();
