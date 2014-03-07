@@ -138,6 +138,7 @@ class Chat_Room_Redux {
 	public static function prettify_message( $msg ) {
 		$msg->user = get_userdata( $msg->user )->display_name;
 		$msg->when = date( get_option( 'time_format' ), $msg->when );
+		$msg->text = stripslashes( $msg->text );
 
 		return $msg;
 	}
@@ -225,7 +226,7 @@ class Chat_Room_Redux {
 		wp_send_json_success( array(
 			'user' => wp_get_current_user()->display_name,
 			'when' => date( get_option( 'time_format' ) ),
-			'text' => $message,
+			'text' => stripslashes( $message ),
 		) );
 	}
 
