@@ -74,7 +74,9 @@ class Chat_Room_Redux {
 	 * Does the actual meta box on the edit screen -- added by self::meta_box_cb()
 	 */
 	public static function chat_room_contents_cb( $post, $metabox ) {
-		self::display_messages( self::get_messages( $post->ID ) );
+		$messages = self::get_messages( $post->ID );
+		$messages = array_map( array( __CLASS__, 'prettify_message' ), $messages );
+		self::display_messages( $messages );
 	}
 
 	/**
