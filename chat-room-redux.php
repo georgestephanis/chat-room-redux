@@ -9,8 +9,6 @@
  * License: GPLv2+
  */
 
-add_action( 'init', array( 'Chat_Room_Redux', 'init' ) );
-
 class Chat_Room_Redux {
 
 	const POST_TYPE    = 'chat-room';
@@ -21,13 +19,19 @@ class Chat_Room_Redux {
 	/**
 	 * Kicks everything off.
 	 */
-	public static function init() {
-		self::register_post_type();
-		self::register_scripts_styles();
-
+	public static function go() {
+		add_action( 'init', array( __CLASS__, 'init' ) );
 		add_filter( 'the_content', array( __CLASS__, 'add_chat_room' ), 0 );
 		add_action( 'wp_ajax_chat_room_add_message', array( __CLASS__, 'wp_ajax_chat_room_add_message' ) );
 		add_action( 'wp_ajax_chat_room_get_new_messages', array( __CLASS__, 'wp_ajax_chat_room_get_new_messages' ) );
+	}
+
+	/**
+	 * Runs on init
+	 */
+	public static function init() {
+		self::register_post_type();
+		self::register_scripts_styles();
 
 		add_shortcode( self::SHORTCODE, array( __CLASS__, 'chat_room' ) );
 	}
@@ -260,3 +264,5 @@ class Chat_Room_Redux {
 	}
 
 }
+
+Chat_Room_Redux::go();
