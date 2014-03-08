@@ -21,6 +21,7 @@ class Chat_Room_Redux {
 	 */
 	public static function go() {
 		add_action( 'init', array( __CLASS__, 'init' ) );
+		add_action( 'save_post', array( __CLASS__, 'save_chat_room' ), 10, 2 );
 		add_filter( 'the_content', array( __CLASS__, 'add_chat_room' ), 0 );
 		add_action( 'wp_ajax_chat_room_add_message', array( __CLASS__, 'wp_ajax_chat_room_add_message' ) );
 		add_action( 'wp_ajax_chat_room_get_new_messages', array( __CLASS__, 'wp_ajax_chat_room_get_new_messages' ) );
@@ -80,7 +81,55 @@ class Chat_Room_Redux {
 	public static function chat_room_contents_cb( $post, $metabox ) {
 		$messages = self::get_messages( $post->ID );
 		$messages = array_map( array( __CLASS__, 'prettify_message' ), $messages );
-		self::display_messages( $messages );
+		wp_nonce_field( 'save_chat_room', 'chat_nonce' );
+		?>
+
+		<table class="form-table">
+			<tr>
+				<th style="width:20%;"><label for="_chat_room_active"><?php esc_html_e( 'Active?' ); ?></label></th>
+				<td>
+					<input type="checkbox" id="_chat_room_active" name="_chat_room_active" <?php checked( self::is_chat_room_active( $post->ID ) ); ?>>
+					<em><label for="_chat_room_active"><?php esc_html_e( 'Whether new messages can be submitted.' ); ?></label></em>
+				</td>
+			</tr>
+		</table>
+		<h3><?php esc_html_e( 'Chat Messages:' ); ?></h3>
+		<?php self::display_messages( $messages );
+	}
+
+	/**
+	 * The function that saves our custom chat settings.
+	 */
+	public static function save_chat_room( $chat_id, $post ) {
+		if ( self::POST_TYPE !== $post->post_type ) {
+			return $chat_id;
+		}
+		if ( empty( $_REQUEST['chat_nonce'] ) ) {
+			return $chat_id;
+		}
+		if ( ! wp_verify_nonce( $_REQUEST['chat_nonce'], 'save_chat_room' ) ) {
+			return $chat_id;
+		}
+		$post_type = get_post_type_object( self::POST_TYPE );
+		if ( ! current_user_can( $post_type->cap->edit_post, $chat_id ) ) {
+			return $chat_id;
+		}
+
+		$_chat_room_active = ! empty( $_REQUEST['_chat_room_active'] ) ? 'active' : 'inactive';
+		update_post_meta( $chat_id, '_chat_room_active', $_chat_room_active );
+	}
+
+	/**
+	 * Checks the postmeta to find out if the chat room is active or not.
+	 */
+	public static function is_chat_room_active( $chat_id ) {
+		$active = true;
+
+		if ( 'inactive' === get_post_meta( $chat_id, '_chat_room_active', true ) ) {
+			$active = false;
+		}
+
+		return apply_filters( 'chat_room_active', $active, $chat_id );
 	}
 
 	/**
@@ -171,7 +220,7 @@ class Chat_Room_Redux {
 
 		// If we're not on the single post page, we don't
 		// want to display it as a chat room.
-		if ( ! is_singular( self::POST_TYPE ) ) {
+		if ( ! is_singular( self::POST_TYPE ) || ! self::is_chat_room_active( $atts['chat_id'] ) ) {
 			ob_start();
 			self::display_messages( $messages );
 			return ob_get_clean();
@@ -227,6 +276,10 @@ class Chat_Room_Redux {
 			wp_send_json_error( __( 'Error: Invalid Nonce.' ) );
 		}
 
+		if ( ! self::is_chat_room_active( $chat_id ) ) {
+			wp_send_json_error( __( 'Error: Chat is not active.' ) );
+		}
+
 		self::add_message( $message, $chat_id );
 
 		wp_send_json_success( array(
@@ -251,6 +304,10 @@ class Chat_Room_Redux {
 		
 		if ( ! wp_verify_nonce( $nonce, 'chat-room-' . $chat_id ) ) {
 			wp_send_json_error( __( 'Error: Invalid Nonce.' ) );
+		}
+
+		if ( ! self::is_chat_room_active( $chat_id ) ) {
+			wp_send_json_error( __( 'Error: Chat is not active.' ) );
 		}
 
 		$messages = self::get_messages( intval( $_REQUEST['chat_id'] ) );
