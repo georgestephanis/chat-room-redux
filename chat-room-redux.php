@@ -44,6 +44,7 @@ class Chat_Room_Redux {
 		$args = array(
 			'label'           => esc_html__( 'Chat Rooms' ),
 			'public'          => true,
+			'has_archive'     => true,
 			'menu_position'   => 5,
 			'menu_icon'       => 'dashicons-format-chat',
 			'capability_type' => 'page',
