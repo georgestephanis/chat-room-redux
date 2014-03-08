@@ -89,7 +89,7 @@ class Chat_Room_Redux {
 				<th style="width:20%;"><label for="_chat_room_active"><?php esc_html_e( 'Active?' ); ?></label></th>
 				<td>
 					<input type="checkbox" id="_chat_room_active" name="_chat_room_active" <?php checked( self::is_chat_room_active( $post->ID ) ); ?>>
-					<em><label for="_chat_room_active"><?php esc_html_e( 'Whether new messages can be submitted.' ); ?></label></em>
+					<em><label for="_chat_room_active"><?php esc_html_e( 'Checked if the chat room is accepting new messages.' ); ?></label></em>
 				</td>
 			</tr>
 		</table>
