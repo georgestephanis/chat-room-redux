@@ -26,6 +26,7 @@ class Chat_Room_Redux {
 		add_action( 'init', array( __CLASS__, 'init' ) );
 		add_action( 'save_post', array( __CLASS__, 'save_chat_room' ), 10, 2 );
 		add_filter( 'the_content', array( __CLASS__, 'add_chat_room' ), 0 );
+		add_filter( 'is_protected_meta', array( __CLASS__, 'is_protected_meta' ), 10, 2 );
 		add_action( 'wp_ajax_chat_room_add_message', array( __CLASS__, 'wp_ajax_chat_room_add_message' ) );
 		add_action( 'wp_ajax_chat_room_get_new_messages', array( __CLASS__, 'wp_ajax_chat_room_get_new_messages' ) );
 	}
@@ -56,6 +57,23 @@ class Chat_Room_Redux {
 		);
 
 		register_post_type( self::POST_TYPE, $args );
+	}
+
+	/**
+	 * Make sure our metas are flagged as private. Even though we're not prefixing with _.
+	 */
+	public static function is_protected_meta( $is_protected, $meta_key ) {
+		$protected_metas = array(
+			self::MSG_META_KEY,
+			self::PRESENCE_KEY,
+			self::TYPING_KEY,
+		);
+
+		if ( in_array( $meta_key, $protected_metas ) ) {
+			$is_protected = true;
+		}
+
+		return $is_protected;
 	}
 
 	/**
