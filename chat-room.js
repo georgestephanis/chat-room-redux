@@ -1,7 +1,8 @@
 /* global chat_room_l10n */
 
 (function( $, misc ){
-	var $messages = $('.chat-room-scrollback .messages');
+	var $messages = $('.chat-room-scrollback .messages'),
+		$roster   = $('.chat-room-roster');
 
 	$('form.chat-room-input textarea').autosize({append: "\n"});
 
@@ -51,36 +52,46 @@
 	});
 
 	function getNewMessages() {
-		var new_html = '',
+		var new_html    = '',
+			roster_html = '',
 			submit_data = {
 				action  : 'chat_room_get_new_messages',
+				typing  : ( $( 'form.chat-room-input textarea' ).val().length ? true : '' ),
 				count   : $messages.find('dt:not(.no-messages-found)').length,
 				chat_id : misc.chat_id,
 				nonce   : misc.nonce
 			};
 
-		$.getJSON( misc.ajax_url, submit_data, function( data ) {
-			if ( ! data.success ) {
+		$.getJSON( misc.ajax_url, submit_data, function( response ) {
+			if ( ! response.success ) {
 				if ( console ) {
-					console.log( data.data );
+					console.log( response.data );
 				}
 				return;
 			}
 
-			if ( data.data ) {
-				$.each( data.data, function( index, msg ) {
+			if ( response.data.messages ) {
+				$.each( response.data.messages, function( index, msg ) {
 					new_html += '<dt>' + msg.user;
 					if ( misc.show_times ) {
 						new_html += ' ( ' + msg.when + ' )';
 					}
-					new_html += ' </dt><dd>' + msg.text + '</dd>';
+					new_html += '</dt><dd>' + msg.text + '</dd>';
 				});
 				$messages.html( new_html );
 
 				$messages.parent().scrollTo( 'max' );
 			} else {
-				console.log( 'No New Messages' );
+				if ( console ) {
+					console.log( 'No New Messages' );
+				}
 			}
+
+			$.each( response.data.presence, function( user, data ) {
+				roster_html += '<li' + ( data.typing ? ' class="typing"' : '' ) + '>' + user + '</li>';
+			});
+			$roster.html( roster_html );
+
 		} );
 	}
 

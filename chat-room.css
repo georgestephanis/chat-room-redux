@@ -11,6 +11,9 @@
 
 .chat-room-wrapper .chat-room-scrollback {
 	height: 300px;
+	width: 80%;
+	width: calc( 100% - 150px );
+	float: left;
 	overflow: auto;
 }
 
@@ -48,7 +51,26 @@
 	white-space: pre-line;
 }
 
+.chat-room-wrapper .chat-room-roster {
+	float: right;
+	width: 150px;
+	height: 300px;
+	border-left: 2px solid #444;
+	padding: 10px;
+	margin: 0;
+}
+
+.chat-room-wrapper .chat-room-roster li {
+	list-style-type: none;
+	margin-left: 0;
+}
+
+.chat-room-wrapper .chat-room-roster li.typing {
+	font-style: italic;
+}
+
 .chat-room-wrapper .chat-room-input {
+	clear: both;
 	background: #444;
 	overflow: hidden;
 }

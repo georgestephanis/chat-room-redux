@@ -13,8 +13,11 @@ class Chat_Room_Redux {
 
 	const POST_TYPE    = 'chat-room';
 	const MSG_META_KEY = 'chat-room-message';
+	const PRESENCE_KEY = 'chat-room-presence';
+	const TYPING_KEY   = 'chat-room-typing';
 	const SHORTCODE    = 'chat-room';
 	const SHOW_TIMES   = false;
+	const CHK_INTERVAL = 5;
 
 	/**
 	 * Kicks everything off.
@@ -50,7 +53,6 @@ class Chat_Room_Redux {
 			'capability_type' => 'page',
 			'supports'        => array( 'title', 'editor' ),
 			'register_meta_box_cb' => array( __CLASS__, 'meta_box_cb' ),
-			
 		);
 
 		register_post_type( self::POST_TYPE, $args );
@@ -153,6 +155,92 @@ class Chat_Room_Redux {
 	}
 
 	/**
+	 * Gets array of users that are currently logged in to the chat.
+	 */
+	public static function get_present_users( $chat_id, $timeframe = 'recent' ) {
+		$present_users = get_post_meta( $chat_id, self::PRESENCE_KEY, true );
+
+		if ( ! is_array( $present_users ) ) {
+			$present_users = array();
+		}
+
+		if ( 'recent' === $timeframe ) {
+			foreach ( $present_users as $user_id => $last_seen ) {
+				// If they've not checked in recently, don't pass them back.
+				if ( ( $last_seen + ( 4 * self::CHK_INTERVAL ) ) < time() ) {
+					unset( $present_users[ $user_id ] );
+				}
+			}
+		}
+
+		return (array) apply_filters( 'chat-room-get-present-users', $present_users, $chat_id, $timeframe );
+	}
+
+	/**
+	 * Update the last seen of the current/specified user.
+	 */
+	private static function register_presence( $chat_id ) {
+		if ( ! is_int( $chat_id ) ) {
+			return new WP_Error( 'bad_chat_id' );
+		}
+
+		$user_id = get_current_user_id();
+
+		$present_users = self::get_present_users( $chat_id, 'all' );
+		$present_users[ $user_id ] = time();
+		update_post_meta( $chat_id, self::PRESENCE_KEY, $present_users );
+	}
+
+	/**
+	 * 
+	 */
+	public static function get_typing_users( $chat_id ) {
+		$typing_users = get_post_meta( $chat_id, self::TYPING_KEY, true );
+
+		return $typing_users;
+	}
+
+	/**
+	 * 
+	 */
+	private static function register_typing( $chat_id, $is_typing ) {
+		if ( ! is_int( $chat_id ) ) {
+			return new WP_Error( 'bad_chat_id' );
+		}
+
+		$user_id   = get_current_user_id();
+		$is_typing = (bool) $is_typing;
+
+		$typing_users = self::get_typing_users( $chat_id );
+		$typing_users[ $user_id ] = $is_typing;
+		update_post_meta( $chat_id, self::TYPING_KEY, $typing_users );
+	}
+
+	/**
+	 * Format present users.
+	 */
+	public static function format_present_users( $users_array, $chat_id ) {
+		if ( ! is_int( $chat_id ) ) {
+			return new WP_Error( 'bad_chat_id' );
+		}
+
+		$formatted    = array();
+		$typing_users = self::get_typing_users( $chat_id );
+
+		foreach( $users_array as $user_id => $last_seen ) {
+			$display_name = get_userdata( $user_id )->display_name;
+			$formatted[ $display_name ] = array(
+				'typing'  => ! empty( $typing_users[ $user_id ] ),
+			//	'elapsed' => ( time() - $last_seen ),
+			);
+		}
+
+		ksort( $formatted );
+
+		return $formatted;
+	}
+
+	/**
 	 * Displays the messages in a definition list, or a paragraph
 	 * remarking that there were none found.
 	 */
@@ -162,11 +250,12 @@ class Chat_Room_Redux {
 		<dl class="messages">
 		<?php if ( $messages && is_array( $messages ) ) : ?>
 			<?php foreach ( $messages as $msg ) : ?>
-				<dt><?php echo esc_html( $msg->user ); ?>
-					<?php if ( self::SHOW_TIMES ) : ?>
-						( <?php echo esc_html( $msg->when ); ?> )
-					<?php endif; ?>
-				</dt>
+				<dt><?php
+						echo esc_html( $msg->user );
+						if ( self::SHOW_TIMES ) {
+							echo ' ( ' . esc_html( $msg->when ) . ' )';
+						}
+					?></dt>
 				<dd><?php echo esc_html( $msg->text ); ?></dd>
 			<?php endforeach; ?>
 		<?php else : ?>
@@ -233,7 +322,7 @@ class Chat_Room_Redux {
 			'nonce'        => wp_create_nonce( 'chat-room-' . $atts['chat_id'] ),
 			'display_name' => wp_get_current_user()->display_name,
 			'time_format'  => get_option( 'time_format' ),
-			'chk_interval' => 5,
+			'chk_interval' => self::CHK_INTERVAL,
 			'show_times'   => self::SHOW_TIMES,
 		) );
 		wp_enqueue_script( 'chat-room' );
@@ -244,6 +333,8 @@ class Chat_Room_Redux {
 			<div class="chat-room-scrollback">
 				<?php self::display_messages( $messages ); ?>
 			</div>
+			<ul class="chat-room-roster">
+			</ul>
 			<form class="chat-room-input">
 				<textarea id="chat-room-input" placeholder="<?php esc_attr_e( 'What would you like to say?' ); ?>"></textarea>
 				<button type="submit"><?php esc_html_e( 'Submit Message' ); ?></button>
@@ -311,14 +402,20 @@ class Chat_Room_Redux {
 			wp_send_json_error( __( 'Error: Chat is not active.' ) );
 		}
 
-		$messages = self::get_messages( intval( $_REQUEST['chat_id'] ) );
+		self::register_presence( $chat_id );
+		self::register_typing( $chat_id, ! empty( $_REQUEST['typing'] ) );
+
+		$messages = self::get_messages( $chat_id );
 		$messages = array_map( array( __CLASS__, 'prettify_message' ), $messages );
 
 		if ( sizeof( $messages ) == $count ) {
-			wp_send_json_success( 0 );
+			$messages = 0;
 		}
 
-		wp_send_json_success( $messages );
+		wp_send_json_success( array(
+			'messages' => $messages,
+			'presence' => self::format_present_users( self::get_present_users( $chat_id ), $chat_id ),
+		) );
 	}
 
 }
